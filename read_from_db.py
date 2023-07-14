@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models import Recipe, Ingredient, Tags, Steps, Nutrition
+from app.models import Recipe, Ingredient, Tag, Step, Nutrition
 from app.database import SessionLocal
 
 
@@ -8,8 +8,8 @@ db = SessionLocal()
 recipe_id = 137739
 recipe = db.query(Recipe).filter(Recipe.id == recipe_id).first()
 ingredients = db.query(Ingredient).filter(Ingredient.recipe_id == recipe_id).all()
-tags = db.query(Tags).filter(Tags.recipe_id == recipe_id).all()
-steps = db.query(Steps).filter(Steps.recipe_id == recipe_id).all()
+tags = db.query(Tag).filter(Tag.recipe_id == recipe_id).all()
+steps = db.query(Step).filter(Step.recipe_id == recipe_id).all()
 nutrition = db.query(Nutrition).filter(Nutrition.recipe_id == recipe_id).first()
 
 

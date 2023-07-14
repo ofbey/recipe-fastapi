@@ -1,19 +1,25 @@
 from sqlalchemy.orm import Session
-from app.models import Recipe, Ingredient, Tags, Steps, Nutrition
+from app.models import Recipe, Ingredient, Tag, Step, Nutrition
 from app.database import SessionLocal
 import pandas as pd
-
+import time
 
 db = SessionLocal()
-
 
 def load_recipes(csv_file):
     recipe_df = pd.read_csv(csv_file)
     recipe_df = recipe_df.head(10)
 
-    for _, row in recipe_df.iterrows():
+    recipe_data = recipe_df.to_dict(orient='records')
+
+    for row in recipe_data:
+        recipe_id = row['id']
+
+        if pd.isnull(recipe_id):
+            continue
+
         recipe = Recipe(
-            id=int(row['id']),
+            id=recipe_id,
             name=row['name'],
             minutes=int(row['minutes']),
             n_steps=int(row['n_steps']),
@@ -29,10 +35,18 @@ def load_recipes(csv_file):
 def load_ingredients(csv_file):
     ingredient_df = pd.read_csv(csv_file)
     ingredient_df = ingredient_df.head(10)
+    ingredient_data = ingredient_df.to_dict(orient='records')
 
-    for _, row in ingredient_df.iterrows():
+    for row in ingredient_data:
+        ingredient_id = int(row['id'])
+
+        # Check if the recipe_id exists in the Recipe table
+        db_recipe = db.query(Recipe).filter(Recipe.id == ingredient_id).first()
+        if db_recipe is None:
+            continue
+
         ingredient = Ingredient(
-            recipe_id=int(row['id']),
+            recipe_id=ingredient_id,
             ingredient=row['ingredients'],
             ingredient_number=int(row['ingredient_number'])
         )
@@ -45,10 +59,18 @@ def load_ingredients(csv_file):
 def load_tags(csv_file):
     tags_df = pd.read_csv(csv_file)
     tags_df = tags_df.head(10)
+    tags_data = tags_df.to_dict(orient='records')
 
-    for _, row in tags_df.iterrows():
-        tag = Tags(
-            recipe_id=int(row['id']),
+    for row in tags_data:
+        tags_id = int(row['id'])
+
+        db_recipe = db.query(Recipe).filter(Recipe.id == tags_id).first()
+        if db_recipe is None:
+            continue
+
+
+        tag = Tag(
+            recipe_id=tags_id,
             tag=row['tags'],
             tag_number=int(row['tag_number'])
         )
@@ -61,10 +83,17 @@ def load_tags(csv_file):
 def load_steps(csv_file):
     steps_df = pd.read_csv(csv_file)
     steps_df = steps_df.head(10)
+    steps_data = steps_df.to_dict(orient='records')
 
-    for _, row in steps_df.iterrows():
-        step = Steps(
-            recipe_id=int(row['id']),
+    for row in steps_data:
+        steps_id = int(row['id'])
+
+        db_recipe = db.query(Recipe).filter(Recipe.id == steps_id).first()
+        if db_recipe is None:
+            continue
+
+        step = Step(
+            recipe_id=steps_id,
             step=row['steps'],
             step_number=int(row['step_number'])
         )
@@ -74,18 +103,18 @@ def load_steps(csv_file):
     db.commit()
 
 
-from app.models import Nutrition
-
 def load_nutrition(csv_file):
     nutrition_df = pd.read_csv(csv_file)
     nutrition_df = nutrition_df.head(10)
 
-    for _, row in nutrition_df.iterrows():
+    nutrition_data = nutrition_df.to_dict(orient='records')
 
+    for row in nutrition_data:
         nutrition_id = int(row['id']) if not pd.isnull(row['id']) else None
 
-
-        if db.query(Recipe).filter(Recipe.id == nutrition_id).first() is None:
+        # Check if the recipe_id exists in the Recipe table
+        db_recipe = db.query(Recipe).filter(Recipe.id == nutrition_id).first()
+        if db_recipe is None:
             continue
 
         nutrition = Nutrition(
@@ -104,19 +133,23 @@ def load_nutrition(csv_file):
     db.commit()
 
 
+recipe_csv_file = 'data/recipes_table.csv'
+ingredient_csv_file = 'data/ingredients_table.csv'
+tags_csv_file = 'data/tags_table.csv'
+steps_csv_file = 'data/steps_table.csv'
+nutrition_csv_file = 'data/nutrition_table.csv'
 
+start_time = time.time()
 
-recipe_csv_file = 'recipe_dataset/recipes_table.csv'
-ingredient_csv_file = 'recipe_dataset/ingredients_table.csv'
-tags_csv_file = 'recipe_dataset/tags_table.csv'
-steps_csv_file = 'recipe_dataset/steps_table.csv'
-nutrition_csv_file = 'recipe_dataset/nutrition_table.csv'
+# load_recipes(recipe_csv_file)
+# load_ingredients(ingredient_csv_file)
+# load_tags(tags_csv_file)
+# load_steps(steps_csv_file)
+# load_nutrition(nutrition_csv_file)
 
-load_recipes(recipe_csv_file)
-load_ingredients(ingredient_csv_file)
-load_tags(tags_csv_file)
-load_steps(steps_csv_file)
-load_nutrition(nutrition_csv_file)
+end_time = time.time()
+execution_time = end_time - start_time
 
+print(f"Loading data took {execution_time} seconds")
 
 db.close()

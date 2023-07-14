@@ -1,21 +1,12 @@
 from typing import List
 from pydantic import BaseModel
 
-
-
 class RecipeBase(BaseModel):
     name: str
     minutes: int
     n_steps: int
     description: str
     n_ingredients: int
-
-class RecipeList(RecipeBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
 
 class RecipeIn(RecipeBase):
     pass
@@ -32,7 +23,7 @@ class IngredientBase(BaseModel):
     ingredient: str
     ingredient_number: int
 
-class IngredientCreate(IngredientBase):
+class IngredientIn(IngredientBase):
     pass
 
 class IngredientOut(IngredientBase):
@@ -46,7 +37,7 @@ class TagBase(BaseModel):
     tag: str
     tag_number: int
 
-class TagCreate(TagBase):
+class TagIn(TagBase):
     pass
 
 class TagOut(TagBase):
@@ -60,7 +51,7 @@ class StepBase(BaseModel):
     step: str
     step_number: int
 
-class StepCreate(StepBase):
+class StepIn(StepBase):
     pass
 
 class StepOut(StepBase):
@@ -79,7 +70,7 @@ class NutritionBase(BaseModel):
     saturated_fat: float
     carbohydrates: float
 
-class NutritionCreate(NutritionBase):
+class NutritionIn(NutritionBase):
     pass
 
 class NutritionOut(NutritionBase):
@@ -88,3 +79,4 @@ class NutritionOut(NutritionBase):
 
     class Config:
         orm_mode = True
+

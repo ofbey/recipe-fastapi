@@ -12,12 +12,12 @@ router = APIRouter(
 
 @router.get("/", response_model=List[schemas.TagOut])
 def get_tags(db: Session = Depends(get_db)):
-    db_tags = db.query(models.Tags).all()
+    db_tags = db.query(models.Tag).all()
     return db_tags
 
 @router.get("/{recipe_id}", response_model=List[schemas.TagOut])
 def get_tag(recipe_id: int, db: Session = Depends(get_db)):
-    db_tag = db.query(models.Tags).filter(models.Tags.recipe_id == recipe_id).all()
+    db_tag = db.query(models.Tag).filter(models.Tag.recipe_id == recipe_id).all()
     if db_tag is None:
         raise HTTPException(status_code=404, detail="Tag not found")
     return db_tag

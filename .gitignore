@@ -1,4 +1,10 @@
-recipe_dataset/
+recipes.csv
+recipes_table.csv
+tags_table.csv
+steps_table.csv
+ingredients_table.csv
+nutrition_table.csv
+data/
 .env# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

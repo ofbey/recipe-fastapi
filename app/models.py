@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy.sql.expression import text
 from sqlalchemy.orm import relationship
-
+from sqlalchemy.sql.sqltypes import TIMESTAMP
 
 from .database import Base
 
@@ -16,9 +17,10 @@ class Recipe(Base):
     n_steps = Column(Integer)
     description = Column(String)
     n_ingredients = Column(Integer)
+    # created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
     ingredients = relationship("Ingredient", cascade="all, delete", backref="recipe")
-    tags = relationship("Tags", cascade="all, delete", backref="recipe")
-    steps = relationship("Steps", cascade="all, delete", backref="recipe")
+    tags = relationship("Tag", cascade="all, delete", backref="recipe")
+    steps = relationship("Step", cascade="all, delete", backref="recipe")
     nutrition = relationship("Nutrition", cascade="all, delete", backref="recipe")
 
 class Ingredient(Base):
@@ -28,14 +30,14 @@ class Ingredient(Base):
     ingredient = Column(String)
     ingredient_number = Column(Integer)
 
-class Tags(Base):
+class Tag(Base):
     __tablename__ = "tags"
     id = Column(Integer, primary_key=True)
     recipe_id = Column(Integer, ForeignKey("recipes.id"))
     tag = Column(String)
     tag_number = Column(Integer)
 
-class Steps(Base):
+class Step(Base):
     __tablename__ = "steps"
     id = Column(Integer, primary_key=True)
     recipe_id = Column(Integer, ForeignKey("recipes.id"))
@@ -43,7 +45,7 @@ class Steps(Base):
     step_number = Column(Integer)
 
 class Nutrition(Base):
-    __tablename__ = "nutrition"
+    __tablename__ = "nutritions"
     id = Column(Integer, primary_key=True)
     recipe_id = Column(Integer, ForeignKey("recipes.id"))
     calories = Column(Float)
