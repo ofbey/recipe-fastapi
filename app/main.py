@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import recipe
+from .routers import recipe, ingredient, tag, step , nutrition
 from . import models
 from .database import engine
 # from . config import settings
@@ -21,6 +21,10 @@ origins = ["*"]
 
 
 app.include_router(recipe.router)
+app.include_router(ingredient.router)
+app.include_router(tag.router)
+app.include_router(step.router)
+app.include_router(nutrition.router)
 
 @app.get("/")
 def root():

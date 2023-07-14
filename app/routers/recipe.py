@@ -13,6 +13,49 @@ router = APIRouter(
     tags=['Recipes']
 )
 
+@router.get("/", response_model=List[schemas.RecipeList])
+def get_recipes(db: Session = Depends(get_db)):
+    db_recipes = db.query(models.Recipe).all()
+    print(db_recipes)
+    return db_recipes
+
+@router.get("/{recipe_id}", response_model=RecipeOut)
+def get_recipe(recipe_id: int, db: Session = Depends(get_db)):
+    db_recipe = db.query(Recipe).filter(Recipe.id == recipe_id).first()
+    if db_recipe is None:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    print(db_recipe)
+    return db_recipe
+
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=RecipeOut)
+def create_recipe(recipe: RecipeIn, db: Session = Depends(get_db)):
+    db_recipe = Recipe(**recipe.dict())
+    db.add(db_recipe)
+    db.commit()
+    db.refresh(db_recipe)
+    print(db_recipe)
+    return db_recipe
+
+@router.put("/{recipe_id}", response_model=RecipeOut)
+def update_recipe(recipe_id: int, recipe: RecipeIn, db: Session = Depends(get_db)):
+    db_recipe = db.query(Recipe).filter(Recipe.id == recipe_id).first()
+    if db_recipe is None:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    for key, value in recipe.dict(exclude_unset=True).items():
+        setattr(db_recipe, key, value)
+    db.commit()
+    db.refresh(db_recipe)
+    return db_recipe
+
+@router.delete("/{recipe_id}", response_model=RecipeOut)
+def delete_recipe(recipe_id: int, db: Session = Depends(get_db)):
+    db_recipe = db.query(Recipe).filter(Recipe.id == recipe_id).first()
+    if db_recipe is None:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    db.delete(db_recipe)
+    db.commit()
+    return db_recipe
+
 
 # @router.get("/", response_model=List[RecipeList])
 # def read_recipes(db: Session = Depends(get_db), skip: int = 0, limit: int = 20):
@@ -111,45 +154,3 @@ router = APIRouter(
 
 ##############################
 
-@router.get("/", response_model=List[schemas.RecipeList])
-def get_recipe(db: Session = Depends(get_db)):
-    db_recipes = db.query(models.Recipe).all()
-    print(db_recipes)
-    return db_recipes
-
-@router.get("/{recipe_id}", response_model=RecipeOut)
-def get_recipe(recipe_id: int, db: Session = Depends(get_db)):
-    db_recipe = db.query(Recipe).filter(Recipe.id == recipe_id).first()
-    if db_recipe is None:
-        raise HTTPException(status_code=404, detail="Recipe not found")
-    print(db_recipe)
-    return db_recipe
-
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=RecipeOut)
-def create_recipe(recipe: RecipeIn, db: Session = Depends(get_db)):
-    db_recipe = Recipe(**recipe.dict())
-    db.add(db_recipe)
-    db.commit()
-    db.refresh(db_recipe)
-    print(db_recipe)
-    return db_recipe
-
-@router.put("/{recipe_id}", response_model=RecipeOut)
-def update_recipe(recipe_id: int, recipe: RecipeIn, db: Session = Depends(get_db)):
-    db_recipe = db.query(Recipe).filter(Recipe.id == recipe_id).first()
-    if db_recipe is None:
-        raise HTTPException(status_code=404, detail="Recipe not found")
-    for key, value in recipe.dict(exclude_unset=True).items():
-        setattr(db_recipe, key, value)
-    db.commit()
-    db.refresh(db_recipe)
-    return db_recipe
-
-@router.delete("/{recipe_id}", response_model=RecipeOut)
-def delete_recipe(recipe_id: int, db: Session = Depends(get_db)):
-    db_recipe = db.query(Recipe).filter(Recipe.id == recipe_id).first()
-    if db_recipe is None:
-        raise HTTPException(status_code=404, detail="Recipe not found")
-    db.delete(db_recipe)
-    db.commit()
-    return db_recipe
