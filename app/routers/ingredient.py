@@ -10,8 +10,8 @@ router = APIRouter(
     tags=['Ingredients']
 )
 @router.get("/", response_model=List[schemas.IngredientOut])
-def get_ingredients(db: Session = Depends(get_db)):
-    db_ingredients = db.query(models.Ingredient).all()
+def get_ingredients(page: int = 0, page_size: int = 10,db: Session = Depends(get_db)):
+    db_ingredients = db.query(models.Ingredient).offset(page * page_size).limit(page_size).all()
     return db_ingredients
 
 

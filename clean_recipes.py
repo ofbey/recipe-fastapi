@@ -5,7 +5,7 @@ import ast
 def parse_str_list(s):
     return ast.literal_eval(s)
 
-df = pd.read_csv('recipes.csv')
+df = pd.read_csv('data/recipes.csv')
 
 df_clean = df.drop(columns=['contributor_id', 'submitted'])
 
@@ -33,8 +33,8 @@ ingredients_table['ingredient_number'] = ingredients_table.groupby('id').cumcoun
 
 df_clean = df_clean.drop(columns=['tags', 'steps', 'ingredients', 'nutrition'])
 
-df_clean.to_csv('recipes_table.csv', index=False)
-tags_table.to_csv('tags_table.csv', index=False)
-steps_table.to_csv('steps_table.csv', index=False)
-ingredients_table.to_csv('ingredients_table.csv', index=False)
-nutrition_table.to_csv('nutrition_table.csv', index=False)
+df_clean.to_csv('data/recipes_table.csv', index=False)
+ingredients_table.to_csv('data/ingredients_table.csv', index=False)
+tags_table.to_csv('data/tags_table.csv', index=False)
+steps_table.to_csv('data/steps_table.csv', index=False)
+nutrition_table.to_csv('data/nutrition_table.csv', index=False)

@@ -17,7 +17,7 @@ class Recipe(Base):
     n_steps = Column(Integer)
     description = Column(String)
     n_ingredients = Column(Integer)
-    # created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
     ingredients = relationship("Ingredient", cascade="all, delete", backref="recipe")
     tags = relationship("Tag", cascade="all, delete", backref="recipe")
     steps = relationship("Step", cascade="all, delete", backref="recipe")
@@ -55,3 +55,11 @@ class Nutrition(Base):
     protein = Column(Float)
     saturated_fat = Column(Float)
     carbohydrates = Column(Float)
+
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, nullable=False)
+    email = Column(String, nullable=False, unique=True)
+    password = Column(String, nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True),nullable=False, server_default=text('now()'))

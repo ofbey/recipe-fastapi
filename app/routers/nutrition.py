@@ -11,8 +11,8 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[schemas.NutritionOut])
-def get_nutritions(db: Session = Depends(get_db)):
-    db_steps = db.query(models.Nutrition).all()
+def get_nutritions(page: int = 0, page_size: int = 10, db: Session = Depends(get_db)):
+    db_steps = db.query(models.Nutrition).offset(page * page_size).limit(page_size).all()
     return db_steps
 
 @router.get("/{recipe_id}", response_model=List[schemas.NutritionOut])

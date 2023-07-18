@@ -11,8 +11,8 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[schemas.TagOut])
-def get_tags(db: Session = Depends(get_db)):
-    db_tags = db.query(models.Tag).all()
+def get_tags(page: int = 0, page_size: int = 10,db: Session = Depends(get_db)):
+    db_tags = db.query(models.Tag).offset(page * page_size).limit(page_size).all()
     return db_tags
 
 @router.get("/{recipe_id}", response_model=List[schemas.TagOut])

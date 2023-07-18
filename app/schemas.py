@@ -1,5 +1,5 @@
-from typing import List
-from pydantic import BaseModel
+from datetime import datetime
+from pydantic import BaseModel, EmailStr
 
 class RecipeBase(BaseModel):
     name: str
@@ -80,3 +80,17 @@ class NutritionOut(NutritionBase):
     class Config:
         orm_mode = True
 
+class UserBase(BaseModel):
+    email: EmailStr
+    password: str
+
+class UserIn(UserBase):
+    pass
+
+class UserOut(BaseModel):
+    id: int
+    email: EmailStr
+    created_at: datetime
+
+    class Config:
+        orm_mode = True

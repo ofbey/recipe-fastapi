@@ -8,7 +8,7 @@ db = SessionLocal()
 
 def load_recipes(csv_file):
     recipe_df = pd.read_csv(csv_file)
-    recipe_df = recipe_df.head(10)
+    # recipe_df = recipe_df.head(10)
 
     recipe_data = recipe_df.to_dict(orient='records')
 
@@ -34,7 +34,7 @@ def load_recipes(csv_file):
 
 def load_ingredients(csv_file):
     ingredient_df = pd.read_csv(csv_file)
-    ingredient_df = ingredient_df.head(10)
+    # ingredient_df = ingredient_df.head(10)
     ingredient_data = ingredient_df.to_dict(orient='records')
 
     for row in ingredient_data:
@@ -58,7 +58,7 @@ def load_ingredients(csv_file):
 
 def load_tags(csv_file):
     tags_df = pd.read_csv(csv_file)
-    tags_df = tags_df.head(10)
+    # tags_df = tags_df.head(10)
     tags_data = tags_df.to_dict(orient='records')
 
     for row in tags_data:
@@ -82,7 +82,7 @@ def load_tags(csv_file):
 
 def load_steps(csv_file):
     steps_df = pd.read_csv(csv_file)
-    steps_df = steps_df.head(10)
+    # steps_df = steps_df.head(10)
     steps_data = steps_df.to_dict(orient='records')
 
     for row in steps_data:
@@ -105,7 +105,7 @@ def load_steps(csv_file):
 
 def load_nutrition(csv_file):
     nutrition_df = pd.read_csv(csv_file)
-    nutrition_df = nutrition_df.head(10)
+    # nutrition_df = nutrition_df.head(10)
 
     nutrition_data = nutrition_df.to_dict(orient='records')
 
@@ -145,7 +145,7 @@ start_time = time.time()
 # load_ingredients(ingredient_csv_file)
 # load_tags(tags_csv_file)
 # load_steps(steps_csv_file)
-# load_nutrition(nutrition_csv_file)
+load_nutrition(nutrition_csv_file)
 
 end_time = time.time()
 execution_time = end_time - start_time
