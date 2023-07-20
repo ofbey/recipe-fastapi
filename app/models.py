@@ -12,6 +12,7 @@ from .database import Base
 class Recipe(Base):
     __tablename__ = "recipes"
     id = Column(Integer, primary_key=True)
+    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     name = Column(String)
     minutes = Column(Integer)
     n_steps = Column(Integer)

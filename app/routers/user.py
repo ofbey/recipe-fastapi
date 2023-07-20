@@ -35,12 +35,20 @@ def create_user(user: schemas.UserIn, db: Session = Depends(get_db)):
     return new_user
 
 
-@router.post("/{user_id}", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+@router.put("/{user_id}", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def update_user(user_id:int, user: schemas.UserIn, db: Session = Depends(get_db)):
-    pass
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    update_data = user.dict(exclude_unset=True)
+    db.query(models.User).filter(models.User.id == user_id).update(update_data)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
 @router.delete("/{user_id}", response_model=schemas.UserOut)
-def delete_recipe(user_id: int, db: Session = Depends(get_db)):
+def delete_user(user_id: int, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")

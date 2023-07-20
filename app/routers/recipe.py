@@ -2,7 +2,7 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from ..database import get_db
-from .. import models, schemas
+from .. import models, schemas, oauth2
 
 
 router = APIRouter(
@@ -11,7 +11,12 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[schemas.RecipeOut])
-def get_recipes(page: int = 0, page_size: int = 10, db: Session = Depends(get_db)):
+def get_recipes(
+    page: int = 0,
+    page_size: int = 10,
+    db: Session = Depends(get_db)
+    ):
+
     db_recipes = db.query(models.Recipe).offset(page * page_size).limit(page_size).all()
     return db_recipes
 
@@ -22,32 +27,59 @@ def get_recipes(page: int = 0, page_size: int = 10, db: Session = Depends(get_db
 #     return db_recipes
 
 @router.get("/{recipe_id}", response_model=schemas.RecipeOut)
-def get_recipe(recipe_id: int, db: Session = Depends(get_db)):
+def get_recipe(
+    recipe_id: int,
+    db: Session = Depends(get_db)
+    ):
+
     db_recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
     if db_recipe is None:
         raise HTTPException(status_code=404, detail="Recipe not found")
     return db_recipe
 
 @router.get("/search/{recipe_name}", response_model=List[schemas.RecipeOut])
-def search_recipes(recipe_name: str, page: int = 0, page_size: int = 10, db: Session = Depends(get_db)):
+def search_recipes(
+    recipe_name: str,
+    page: int = 0,
+    page_size: int = 10,
+    db: Session = Depends(get_db)
+    ):
+
     recipes = db.query(models.Recipe).filter(models.Recipe.name.contains(recipe_name)).offset(page * page_size).limit(page_size).all()
     if recipes is None:
         raise HTTPException(status_code=404, detail="Recipe not found")
     return recipes
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.RecipeOut)
-def create_recipe(recipe: schemas.RecipeIn, db: Session = Depends(get_db)):
-    db_recipe = models.Recipe(**recipe.dict())
+def create_recipe(
+    recipe: schemas.RecipeIn,
+    db: Session = Depends(get_db),
+    current_user: int = Depends(oauth2.get_current_user)
+    ):
+
+    db_recipe = models.Recipe(owner_id=current_user.id, **recipe.dict())
     db.add(db_recipe)
     db.commit()
     db.refresh(db_recipe)
     return db_recipe
 
+
 @router.put("/{recipe_id}", response_model=schemas.RecipeOut)
-def update_recipe(recipe_id: int, recipe: schemas.RecipeIn, db: Session = Depends(get_db)):
+def update_recipe(
+    recipe_id: int,
+    recipe: schemas.RecipeIn,
+    db: Session = Depends(get_db),
+    current_user: int = Depends(oauth2.get_current_user)
+    ):
+
     db_recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
     if db_recipe is None:
         raise HTTPException(status_code=404, detail="Recipe not found")
+
+    if db_recipe.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Not authorized to perform requested action")
+
     update_data = recipe.dict(exclude_unset=True)
     db.query(models.Recipe).filter(models.Recipe.id == recipe_id).update(update_data)
     db.commit()
@@ -55,10 +87,20 @@ def update_recipe(recipe_id: int, recipe: schemas.RecipeIn, db: Session = Depend
     return db_recipe
 
 @router.delete("/{recipe_id}", response_model=schemas.RecipeOut)
-def delete_recipe(recipe_id: int, db: Session = Depends(get_db)):
+def delete_recipe(
+    recipe_id: int,
+    db: Session = Depends(get_db),
+    current_user: int = Depends(oauth2.get_current_user)
+    ):
+
     db_recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
     if db_recipe is None:
         raise HTTPException(status_code=404, detail="Recipe not found")
+
+    if db_recipe.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Not authorized to perform requested action")
+
     db.delete(db_recipe)
     db.commit()
     return db_recipe
