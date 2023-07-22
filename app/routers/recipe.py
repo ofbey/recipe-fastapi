@@ -12,21 +12,16 @@ router = APIRouter(
 
 @router.get("/", response_model=List[schemas.RecipeOut])
 def get_recipes(
-    page: int = 0,
-    page_size: int = 10,
+    limit: int = 10,
+    skip: int = 0,
+    search: Optional[str] = "",
     db: Session = Depends(get_db)
     ):
 
-    db_recipes = db.query(models.Recipe).offset(page * page_size).limit(page_size).all()
+    db_recipes = db.query(models.Recipe).filter(models.Recipe.name.contains(search)).limit(limit).offset(skip).all()
     return db_recipes
 
-# @router.get("/", response_model=List[schemas.RecipeOut])
-# def get_recipes(db: Session = Depends(get_db)):
-#     db_recipes = db.query(models.Recipe).all()
-#     print(db_recipes)
-#     return db_recipes
-
-@router.get("/{recipe_id}", response_model=schemas.RecipeOut)
+@router.get("/{recipe_id}", response_model=schemas.RecipeDetailedOut)
 def get_recipe(
     recipe_id: int,
     db: Session = Depends(get_db)
@@ -37,18 +32,6 @@ def get_recipe(
         raise HTTPException(status_code=404, detail="Recipe not found")
     return db_recipe
 
-@router.get("/search/{recipe_name}", response_model=List[schemas.RecipeOut])
-def search_recipes(
-    recipe_name: str,
-    page: int = 0,
-    page_size: int = 10,
-    db: Session = Depends(get_db)
-    ):
-
-    recipes = db.query(models.Recipe).filter(models.Recipe.name.contains(recipe_name)).offset(page * page_size).limit(page_size).all()
-    if recipes is None:
-        raise HTTPException(status_code=404, detail="Recipe not found")
-    return recipes
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.RecipeOut)
 def create_recipe(

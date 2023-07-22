@@ -1,24 +1,34 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import List, Optional
 
-class RecipeBase(BaseModel):
-    name: str
-    minutes: int
-    n_steps: int
-    description: str
-    n_ingredients: int
 
-class RecipeIn(RecipeBase):
+class UserBase(BaseModel):
+    email: EmailStr
+    password: str
+
+class UserIn(UserBase):
     pass
 
-class RecipeOut(RecipeBase):
+class UserOut(BaseModel):
     id: int
+    email: EmailStr
+    created_at: datetime
 
     class Config:
         orm_mode = True
 
-from pydantic import BaseModel
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    id: Optional[str] = None
+
 
 class IngredientBase(BaseModel):
     ingredient: str
@@ -81,28 +91,31 @@ class NutritionOut(NutritionBase):
     class Config:
         orm_mode = True
 
-class UserBase(BaseModel):
-    email: EmailStr
-    password: str
+class RecipeBase(BaseModel):
+    name: str
+    minutes: int
+    n_steps: int
+    description: str
+    n_ingredients: int
 
-class UserIn(UserBase):
+class RecipeIn(RecipeBase):
     pass
 
-class UserOut(BaseModel):
+class RecipeOut(RecipeBase):
     id: int
-    email: EmailStr
-    created_at: datetime
+    owner_id: int
 
     class Config:
         orm_mode = True
 
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
+class RecipeDetailedOut(RecipeBase):
+    id: int
+    owner_id: int
+    owner: UserOut
+    ingredients: List[IngredientOut]
+    tags: List[TagOut]
+    steps: List[StepOut]
+    nutrition: List[NutritionOut]
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-class TokenData(BaseModel):
-    id: Optional[str] = None
+    class Config:
+        orm_mode = True

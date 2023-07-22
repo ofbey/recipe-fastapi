@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
+from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from ..database import get_db
@@ -11,8 +11,11 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[schemas.NutritionOut])
-def get_nutritions(page: int = 0, page_size: int = 10, db: Session = Depends(get_db)):
-    db_steps = db.query(models.Nutrition).offset(page * page_size).limit(page_size).all()
+def get_nutritions(
+    limit: int = 10,
+    skip: int = 0,
+    db: Session = Depends(get_db)):
+    db_steps = db.query(models.Nutrition).limit(limit).offset(skip).all()
     return db_steps
 
 @router.get("/{recipe_id}", response_model=List[schemas.NutritionOut])

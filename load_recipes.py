@@ -6,7 +6,7 @@ import time
 
 db = SessionLocal()
 
-def load_recipes(csv_file):
+def load_recipes(csv_file, owner_id):
     recipe_df = pd.read_csv(csv_file)
     recipe_df = recipe_df.head(5)
 
@@ -24,7 +24,9 @@ def load_recipes(csv_file):
             minutes=int(row['minutes']),
             n_steps=int(row['n_steps']),
             description=row['description'],
-            n_ingredients=int(row['n_ingredients'])
+            n_ingredients=int(row['n_ingredients']),
+            owner_id=owner_id
+
         )
 
         db.add(recipe)
@@ -141,7 +143,8 @@ nutrition_csv_file = 'data/nutrition_table.csv'
 
 start_time = time.time()
 
-load_recipes(recipe_csv_file)
+owner_id = 1
+load_recipes(recipe_csv_file, owner_id)
 # load_ingredients(ingredient_csv_file)
 # load_tags(tags_csv_file)
 # load_steps(steps_csv_file)

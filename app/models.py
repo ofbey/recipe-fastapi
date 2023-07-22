@@ -23,6 +23,8 @@ class Recipe(Base):
     tags = relationship("Tag", cascade="all, delete", backref="recipe")
     steps = relationship("Step", cascade="all, delete", backref="recipe")
     nutrition = relationship("Nutrition", cascade="all, delete", backref="recipe")
+    owner = relationship("User", backref="recipes")
+
 
 class Ingredient(Base):
     __tablename__ = "ingredients"
