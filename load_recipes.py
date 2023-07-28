@@ -36,7 +36,7 @@ def load_recipes(csv_file, owner_id):
 
 def load_ingredients(csv_file):
     ingredient_df = pd.read_csv(csv_file)
-    # ingredient_df = ingredient_df.head(10)
+    ingredient_df = ingredient_df.head(5)
     ingredient_data = ingredient_df.to_dict(orient='records')
 
     for row in ingredient_data:
@@ -84,7 +84,7 @@ def load_tags(csv_file):
 
 def load_steps(csv_file):
     steps_df = pd.read_csv(csv_file)
-    steps_df = steps_df.head(10)
+    steps_df = steps_df.head(5)
     steps_data = steps_df.to_dict(orient='records')
 
     for row in steps_data:
@@ -107,7 +107,7 @@ def load_steps(csv_file):
 
 def load_nutrition(csv_file):
     nutrition_df = pd.read_csv(csv_file)
-    # nutrition_df = nutrition_df.head(10)
+    nutrition_df = nutrition_df.head(5)
 
     nutrition_data = nutrition_df.to_dict(orient='records')
 
@@ -145,10 +145,10 @@ start_time = time.time()
 
 owner_id = 1
 load_recipes(recipe_csv_file, owner_id)
-# load_ingredients(ingredient_csv_file)
-# load_tags(tags_csv_file)
-# load_steps(steps_csv_file)
-# load_nutrition(nutrition_csv_file)
+load_ingredients(ingredient_csv_file)
+load_tags(tags_csv_file)
+load_steps(steps_csv_file)
+load_nutrition(nutrition_csv_file)
 
 end_time = time.time()
 execution_time = end_time - start_time

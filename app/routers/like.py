@@ -8,9 +8,13 @@ router = APIRouter(
     tags=['Like']
 )
 
+# 1 for adding like , 0 for removing like
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def like(like: schemas.Like, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+def like(
+    like: schemas.Like,
+    db: Session = Depends(database.get_db),
+    current_user: int = Depends(oauth2.get_current_user)):
 
     db_recipe = db.query(models.Recipe).filter(models.Recipe.id == like.recipe_id).first()
     if not db_recipe:

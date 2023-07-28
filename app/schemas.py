@@ -100,7 +100,7 @@ class RecipeBase(BaseModel):
 
 class Like(BaseModel):
     recipe_id: int
-    dir: conint(le=1) #fixme limit the input ony 0 and 1
+    dir: conint(ge=0, le=1)
 
 class RecipeIn(RecipeBase):
     pass
