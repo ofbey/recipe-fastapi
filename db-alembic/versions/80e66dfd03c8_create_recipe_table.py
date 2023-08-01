@@ -28,9 +28,12 @@ def upgrade():
         sa.Column('n_ingredients', sa.Integer),
         sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()')),
     )
+    op.create_foreign_key('recipe_users_fk', source_table="recipes", referent_table="users", local_cols=[
+                          'owner_id'], remote_cols=['id'], ondelete="CASCADE")
     pass
 
 
 def downgrade():
+    op.drop_constraint('recipe_users_fk', table_name="recipes")
     op.drop_table('recipes')
     pass

@@ -69,7 +69,7 @@ def update_recipe(
     db.refresh(db_recipe)
     return db_recipe
 
-@router.delete("/{recipe_id}", response_model=schemas.RecipeOut)
+@router.delete("/{recipe_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_recipe(
     recipe_id: int,
     db: Session = Depends(get_db),
@@ -78,7 +78,7 @@ def delete_recipe(
 
     db_recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
     if db_recipe is None:
-        raise HTTPException(status_code=404, detail="Recipe not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe not found")
 
     if db_recipe.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
@@ -86,8 +86,7 @@ def delete_recipe(
 
     db.delete(db_recipe)
     db.commit()
-    return db_recipe
-
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 # @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.RecipeOut)

@@ -1,4 +1,4 @@
-from fastapi import status, HTTPException, Depends, APIRouter
+from fastapi import status, HTTPException, Depends, APIRouter, Response
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from ..database import get_db
@@ -100,4 +100,4 @@ def delete_step(
     db.delete(db_step)
     db.commit()
 
-    return
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
