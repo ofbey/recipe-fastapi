@@ -32,6 +32,6 @@ app.include_router(auth.router)
 
 @app.get("/")
 def root():
-    return {"message": "Recipe Fastapi"}
+    return {"message": "Recipe Fastapi!!"}
 
 
